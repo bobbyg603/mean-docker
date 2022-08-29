@@ -19,8 +19,6 @@
       - [Prerequisite](#prerequisite)
       - [Development mode:](#development-mode)
       - [Production mode:](#production-mode)
-        - [Using 2 containers (Express (frontend and api) and Mongo)](#using-2-containers-express-frontend-and-api-and-mongo)
-        - [Using 4 containers (Mongo,api, angular and nginx)](#using-4-containers-mongoapi-angular-and-nginx)
       - [About Docker Compose File](#about-docker-compose-file)
       - [Pushing Image to Registry (Github Actions)](#pushing-image-to-registry-github-actions)
     - [Without Docker](#without-docker)
@@ -143,9 +141,6 @@ Install latest [Docker Desktop](https://www.docker.com/products/docker-desktop)
      
 #### Production mode:
 
-  For Production mode, there is 2 options: 
- ##### Using 2 containers (Express (frontend and api) and Mongo)
-
   ```
     git clone https://github.com/nitin27may/mean-docker.git
     cd mean-docker
@@ -156,71 +151,14 @@ Install latest [Docker Desktop](https://www.docker.com/products/docker-desktop)
   ``` 
     docker-compose up
   ```
-  It will run fronend and api on `http://localhost:3000`. you can also access mongodb on port 27017
- ##### Using 4 containers (Mongo,api, angular and nginx)
-  ```
-    git clone https://github.com/nitin27may/mean-docker.git
-    cd mean-docker
 
-    docker-compose -f 'docker-compose.nginx.yml' up
-  ```
   It will run fronend and api on `http://localhost`. you can aslo access by it's invidual ports. For Frontend `http://localhost:4000` and for api `http://localhost:3000` .you can also access mongodb on port 27017
 #### About Docker Compose File
 The main focus of this project to show case the possible way to run a real application (Mean stack) using docker.
 
-we have considered 3 scenarios:
+we have considered 2 scenarios:
 
-1. **Using 2 containers** ([docker-compose.yml](/docker-compose.yml)) 
-
-   
-    * express: To host Frontend (Angular) and backend api (expressjs) together
-    * database: To host MongoDB 
-
-  _Note: If in above case we are using MongoDB as managed service then we will require only one container._
-
-
-```dockerfile
-version: "3.8" # specify docker-compose version
-
-# Define the services/containers to be run
-services:
-  express: #name of the second service
-    build: # specify the directory of the Dockerfile
-      context: .
-      dockerfile: dockerfile
-    container_name: mean_angular_express
-    ports:
-      - "3000:3000" #specify ports forewarding
-      # Below database enviornment variable for api is helpful when you have to use database as managed service
-    environment:
-      - SECRET=Thisismysecret
-      - MONGO_DB_USERNAME=admin-user
-      - MONGO_DB_PASSWORD=admin-password
-      - MONGO_DB_HOST=database
-      - MONGO_DB_PORT=
-      - MONGO_DB_PARAMETERS=?authSource=admin
-      - MONGO_DB_DATABASE=mean-contacts
-    links:
-      - database
-
-  database: # name of the third service
-    image: mongo:latest # specify image to build container from
-    container_name: mean_mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin-user
-      - MONGO_INITDB_ROOT_PASSWORD=admin-password
-      - MONGO_DB_USERNAME=admin-user1
-      - MONGO_DB_PASSWORD=admin-password1
-      - MONGO_DB=mean-contacts
-    volumes:
-      - ./mongo:/home/mongodb
-      - ./mongo/init-db.d/:/docker-entrypoint-initdb.d/
-      - ./mongo/db:/data/db
-    ports:
-      - "27017:27017" # specify port forewarding
-```
-
-2. **Using 4 containers** ([docker-compose.nginx.yml](/docker-compose.nginx.yml))
+ **Using 4 containers** ([docker-compose.yml](/docker-compose.yml))
    
     * angular: Application's frontend (Angular) 
     * express: Application's Rest services (expressjs)
@@ -228,6 +166,7 @@ services:
     * nginx: As laod balancer, also expose UI and API on same ports
 
   _Note: If in above case we are using MongoDB as managed service  then we will require only one container._
+
 ```dockerfile
 version: "3.8" # specify docker-compose version
 
@@ -284,7 +223,7 @@ services:
       - angular
 ```
 
-3. **Development Mode** ([docker-compose.debug.yml](/docker-compose.debug.yml))
+ **Development Mode** ([docker-compose.debug.yml](/docker-compose.debug.yml))
 
     It will run 3 containers which are required for development.
 
@@ -347,7 +286,7 @@ services:
         - "27017:27017" # specify port forewarding
 
   ```
-#### Pushing Image to Registry (Github Actions)
+## <u>Pushing Images to Registry (Github Actions)</u>
 
 Earlier, we were using docker hub autobuild triggers to build images and push to registry (Docker Hub), now it is using github action, we can take an example of frontend image: 
 File : 
